@@ -1,19 +1,33 @@
-import { Button } from "@/components/ui/button"
+import { Contact } from "@/components/sections/contact"
+import { DockNav } from "@/components/sections/dock-nav"
+import { Experience } from "@/components/sections/experience"
+import { Hero, HeroText } from "@/components/sections/hero"
+import { IconMarquee } from "@/components/sections/icon-marquee"
+import { Projects } from "@/components/sections/projects"
+import { Stats } from "@/components/sections/stats"
+import { siteConfig } from "@/lib/site-config"
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
+    <div className="flex min-h-svh flex-col">
+      <main
+        id="top"
+        className="flex flex-1 flex-col gap-20 pb-20 md:gap-24 md:pb-24"
+      >
+        {siteConfig.heroLayout === "overlay" ? (
+          <IconMarquee top={<HeroText />} />
+        ) : (
+          <>
+            <Hero />
+            <IconMarquee />
+          </>
+        )}
+        <Projects />
+        <Stats />
+        <Experience />
+      </main>
+      <Contact />
+      <DockNav />
     </div>
   )
 }
