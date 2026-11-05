@@ -3,10 +3,11 @@
 import React, {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ComponentPropsWithoutRef,
 } from "react"
-import { AnimatePresence, motion, type MotionProps } from "motion/react"
+import { AnimatePresence, motion, useInView, type MotionProps } from "motion/react"
 
 import { cn } from "@/lib/utils"
 
@@ -28,43 +29,56 @@ export function AnimatedListItem({ children }: { children: React.ReactNode }) {
 export interface AnimatedListProps extends ComponentPropsWithoutRef<"div"> {
   children: React.ReactNode
   delay?: number
+  /** How many newest items stay visible while the list cycles. */
+  maxItems?: number
 }
 
 export const AnimatedList = React.memo(
-  ({ children, className, delay = 1000, ...props }: AnimatedListProps) => {
+  ({
+    children,
+    className,
+    delay = 1000,
+    maxItems = 4,
+    ...props
+  }: AnimatedListProps) => {
+    const containerRef = useRef<HTMLDivElement>(null)
+    const inView = useInView(containerRef, { margin: "100px" })
     const [index, setIndex] = useState(0)
     const childrenArray = useMemo(
       () => React.Children.toArray(children),
       [children]
     )
+    const count = childrenArray.length
 
     useEffect(() => {
-      let timeout: ReturnType<typeof setTimeout> | null = null
+      if (!inView || count === 0) return
 
-      if (index < childrenArray.length - 1) {
-        timeout = setTimeout(() => {
-          setIndex((prevIndex) => (prevIndex + 1) % childrenArray.length)
-        }, delay)
-      }
+      const timeout = setTimeout(() => {
+        setIndex((prev) => (prev + 1) % count)
+      }, delay)
 
-      return () => {
-        if (timeout !== null) {
-          clearTimeout(timeout)
-        }
-      }
-    }, [index, delay, childrenArray.length])
+      return () => clearTimeout(timeout)
+    }, [index, delay, count, inView])
 
     const itemsToShow = useMemo(() => {
-      const result = childrenArray.slice(0, index + 1).reverse()
-      return result
-    }, [index, childrenArray])
+      if (count === 0) return []
+      // Build a growing window that wraps so the feed never freezes.
+      const visible: React.ReactNode[] = []
+      const windowSize = Math.min(maxItems, count)
+      for (let i = 0; i < windowSize; i++) {
+        const itemIndex = (index - i + count) % count
+        visible.push(childrenArray[itemIndex])
+      }
+      return visible
+    }, [index, childrenArray, count, maxItems])
 
     return (
       <div
+        ref={containerRef}
         className={cn(`flex flex-col items-center gap-4`, className)}
         {...props}
       >
-        <AnimatePresence>
+        <AnimatePresence initial={false} mode="popLayout">
           {itemsToShow.map((item) => (
             <AnimatedListItem key={(item as React.ReactElement).key}>
               {item}

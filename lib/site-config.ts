@@ -90,11 +90,15 @@ export const siteConfig = {
     { label: "Experience", href: "#experience", icon: Briefcase },
     { label: "Contact", href: "#contact", icon: Mail },
   ],
+  /** Primary CTA = contact; secondary = resume. Used by hero, marquee, and footer. */
+  ctas: {
+    primary: { label: "Get in touch", href: "#contact" },
+    secondary: { label: "View resume", href: "/Resume.pdf" },
+  },
   marquee: {
     heading: "Tools I build with every day.",
     description:
       "Flutter and React on the front, Node.js and AWS behind it, AI wired into the middle.",
-    cta: { label: "View my resume", href: "/Resume.pdf" },
   },
   projects: {
     heading: "Things I've shipped.",
@@ -102,9 +106,9 @@ export const siteConfig = {
       "Production apps, platforms, and demos, from App Store releases to multi-tenant APIs.",
   },
   reviews: {
-    heading: "What students say.",
+    heading: "What tutoring looked like.",
     description:
-      "Feedback from my time as a CIS peer tutor at Bellevue University, mentoring 100+ students.",
+      "Themes from mentoring 100+ CIS students at Bellevue University — debugging, design, and shipping fundamentals.",
   },
   experience: {
     heading: "Where I've worked.",
@@ -115,6 +119,8 @@ export const siteConfig = {
     heading: "Let's build something.",
     videoText: "LET'S BUILD",
     email: "rms.dev@outlook.com",
+    primaryCta: { label: "Email me", href: "mailto:rms.dev@outlook.com" },
+    secondaryCta: { label: "View resume", href: "/Resume.pdf" },
     links: [
       { label: "GitHub", href: "https://github.com/rs691" },
       { label: "LinkedIn", href: "https://linkedin.com/in/robert-stewart-m" },
@@ -125,7 +131,9 @@ export const siteConfig = {
 
 export const marqueeRows: MarqueeRow[] = [
   {
-    duration: "30s",
+    // Outer row — travels left (into the heavy right blur)
+    duration: "28s",
+    reverse: true,
     icons: [
       { icon: TypescriptOriginal, label: "TypeScript", className: "text-blue-500", variant: "brand" },
       { icon: JavascriptOriginal, label: "JavaScript", className: "text-yellow-400", variant: "brand" },
@@ -142,8 +150,8 @@ export const marqueeRows: MarqueeRow[] = [
     ],
   },
   {
-    duration: "50s",
-    reverse: true,
+    // Middle row — travels right (opposite the outer rows)
+    duration: "22s",
     icons: [
       { icon: NodejsPlainWordmark, label: "Node.js", className: "text-green-500", variant: "mono", wordmark: true },
       { icon: ExpressOriginal, label: "Express", className: "text-foreground", variant: "mono" },
@@ -160,7 +168,9 @@ export const marqueeRows: MarqueeRow[] = [
     ],
   },
   {
-    duration: "36s",
+    // Outer row — travels left
+    duration: "32s",
+    reverse: true,
     icons: [
       { icon: AmazonwebservicesPlainWordmark, label: "AWS", className: "text-orange-400", variant: "mono", wordmark: true },
       { icon: AzureOriginal, label: "Azure", className: "text-sky-500", variant: "brand" },
@@ -196,54 +206,89 @@ export const projects: Project[] = [
     description:
       "Community rewards platform connecting players with local businesses through geo-validated QR check-ins, points, promotions, and live leaderboards.",
     stack: ["Flutter", "Node.js", "MySQL", "AWS ECS", "Redis", "Socket.IO", "Gemini API"],
-    status: "App Store · Google Play",
+    status: "Live App Store · Google Play",
     icon: Trophy,
     visual: "checkins",
+    links: [
+      { label: "App Store", href: "https://apps.apple.com/us/app/youropoly/id6759983671" },
+      {
+        label: "Google Play",
+        href: "https://play.google.com/store/apps/details?id=com.neil.chamberopoly",
+      },
+    ],
   },
   {
     title: "Good Life Bingo",
     description:
       "Map-based scavenger-hunt app with multi-session play, QR objectives, and a live board that patches in real time, plus push notifications and deep links for re-engagement.",
     stack: ["Flutter", "Node.js", "MySQL", "Redis", "Socket.IO"],
-    status: "Mobile",
+    status: "Live App Store · Google Play",
     icon: Grid3x3,
     visual: "bingo",
+    links: [
+      {
+        label: "App Store",
+        href: "https://apps.apple.com/us/app/good-life-bingo/id6781384530",
+      },
+      {
+        label: "Google Play",
+        href: "https://play.google.com/store/apps/details?id=com.goodlifegames.good_life_bingo",
+      },
+    ],
   },
   {
     title: "Multi-Product Admin Platform",
     description:
       "Central console for permissions, content, and platform operations across tenant products, with org-scoped RBAC enforced at the API layer.",
     stack: ["Node.js", "React", "Next.js", "MySQL", "AWS"],
-    status: "Internal platform",
+    status: "Internal production platform",
     icon: LayoutDashboard,
     visual: "tenants",
+    links: [
+      {
+        label: "Request a walkthrough",
+        href: "mailto:rms.dev@outlook.com?subject=Admin%20platform%20walkthrough",
+      },
+    ],
   },
   {
     title: "E-Commerce Application",
     description:
       "Supabase Auth, Postgres RLS, Stripe Checkout, and AI design and admin copilots with pgvector RAG, gated by contract evals in CI.",
     stack: ["Next.js", "Supabase", "PostgreSQL", "Stripe", "Vercel AI SDK"],
-    status: "Live demo",
+    status: "Open source demo",
     icon: ShoppingBag,
     visual: "storefront",
+    links: [{ label: "View on GitHub", href: "https://github.com/rs691/ecommerce-v1" }],
   },
   {
     title: "Multi-Tenant Task Board API",
     description:
       "REST API that enforces tenant isolation at the ORM layer with EF Core global query filters, deployed to Azure by GitHub Actions.",
     stack: ["C#", "ASP.NET Core", "JWT", "Azure", "GitHub Actions"],
-    status: "Live demo · GitHub",
+    status: "Live API · Azure",
     icon: SquareTerminal,
     visual: "api",
+    links: [
+      {
+        label: "Live API docs",
+        href: "https://multi-tenant-task-board-rs691.azurewebsites.net/scalar/v1#tag/multitenanttaskboard",
+      },
+      {
+        label: "GitHub",
+        href: "https://github.com/rs691/multi-tenant-task-board",
+      },
+    ],
   },
   {
     title: "Django Reservation System",
     description:
       "Booking app with transaction-safe conflict resolution and automated email confirmations.",
     stack: ["Django", "HTMX", "Python", "SQLite"],
-    status: "Live demo",
+    status: "Open source demo",
     icon: CalendarCheck,
     visual: "calendar",
+    links: [{ label: "View on GitHub", href: "https://github.com/rs691/Moffat-Bay" }],
   },
 ]
 
@@ -327,26 +372,33 @@ export type Review = {
   context: string
 }
 
-// TODO: replace with the real tutoring reviews.
+/**
+ * Anonymized themes from peer-tutor sessions — not attributed quotes.
+ * Swap in named testimonials when students grant permission.
+ */
 export const reviews: Review[] = [
   {
-    quote: "Paste the first review here.",
-    name: "Student name",
-    context: "CIS student, Bellevue University",
+    quote:
+      "Went from guessing at SQL joins to designing schemas that actually matched the assignment rubric — and explaining why the relationships mattered.",
+    name: "Database design sessions",
+    context: "CIS peer tutoring · Bellevue University",
   },
   {
-    quote: "Paste the second review here.",
-    name: "Student name",
-    context: "CIS student, Bellevue University",
+    quote:
+      "Code reviews that pushed Clean Code and tests instead of just 'does it run' — the kind of feedback that sticks when you ship the next project.",
+    name: "Software engineering labs",
+    context: "CIS peer tutoring · Bellevue University",
   },
   {
-    quote: "Paste the third review here.",
-    name: "Student name",
-    context: "CIS student, Bellevue University",
+    quote:
+      "Python and JavaScript office hours that untangled loops, APIs, and debugging strategy — not just the answer for tonight's homework.",
+    name: "One-on-one mentoring",
+    context: "100+ students mentored · Bellevue University",
   },
   {
-    quote: "Paste the fourth review here.",
-    name: "Student name",
-    context: "CIS student, Bellevue University",
+    quote:
+      "Structured review materials and database rubrics that got reused across course sections — tutoring that scaled beyond a single appointment.",
+    name: "Course support materials",
+    context: "CIS peer tutoring · Bellevue University",
   },
 ]

@@ -14,8 +14,28 @@ const blurLayers = [
   { blur: "backdrop-blur-[6px]", stops: "transparent 75%, black 100%" },
 ]
 
-const edgeFade =
-  "mask-[linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
+/**
+ * Dial cylinder illusion: soft fade on the left, deeper plunge into blur on the right.
+ * Mobile keeps gentler masks so icons stay readable.
+ */
+const dialTrackMask = {
+  maskImage:
+    "linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 14%, rgba(0,0,0,1) 58%, rgba(0,0,0,0) 94%)",
+  WebkitMaskImage:
+    "linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 14%, rgba(0,0,0,1) 58%, rgba(0,0,0,0) 94%)",
+} as const
+
+const rightBlurMask = {
+  maskImage: "linear-gradient(to left, rgba(0,0,0,1) 28%, rgba(0,0,0,0) 100%)",
+  WebkitMaskImage:
+    "linear-gradient(to left, rgba(0,0,0,1) 28%, rgba(0,0,0,0) 100%)",
+} as const
+
+const leftBlurMask = {
+  maskImage: "linear-gradient(to right, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)",
+  WebkitMaskImage:
+    "linear-gradient(to right, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)",
+} as const
 
 function IconTile({
   icon: Icon,
@@ -28,13 +48,14 @@ function IconTile({
     <div
       title={label}
       className={cn(
-        "tile-depth relative flex size-(--tile) shrink-0 items-center justify-center rounded-2xl border bg-card transition-transform duration-300 hover:-translate-y-1",
+        "tile-depth relative flex size-(--tile) shrink-0 items-center justify-center rounded-2xl border border-black/12 bg-card transition-transform duration-300 hover:-translate-y-1.5 dark:border-white/10",
         className
       )}
+      style={{ transformStyle: "preserve-3d" }}
     >
       <div
         aria-hidden
-        className="absolute inset-0 rounded-2xl bg-current opacity-[0.06]"
+        className="absolute inset-0 rounded-2xl bg-current opacity-[0.1] dark:opacity-[0.06]"
       />
       <TechLogo icon={Icon} variant={variant} wordmark={wordmark} />
       <span className="sr-only">{label}</span>
@@ -80,6 +101,69 @@ function ProgressiveBlur({
   )
 }
 
+function DialBlurWalls() {
+  return (
+    <>
+      {/* A — heavy right blur (icons wrap away into the cylinder) */}
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-y-0 right-0 z-10",
+          "w-[28%] bg-linear-to-l from-background via-background/80 to-transparent backdrop-blur-lg",
+          "md:w-[38%] md:via-background/88 md:backdrop-blur-2xl",
+          "lg:w-[46%] lg:backdrop-blur-3xl"
+        )}
+        style={rightBlurMask}
+      />
+      {/* B — left fade so the dial loses sight near the far edge */}
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-y-0 left-0 z-10",
+          "w-[14%] bg-linear-to-r from-background via-background/65 to-transparent backdrop-blur-sm",
+          "md:w-[20%] md:via-background/75 md:backdrop-blur-md",
+          "lg:w-[24%] lg:backdrop-blur-lg"
+        )}
+        style={leftBlurMask}
+      />
+    </>
+  )
+}
+
+function DialTrack({ className }: { className?: string }) {
+  return (
+    <div className={cn("relative w-full overflow-hidden", className)}>
+      <div
+        className={cn(
+          "w-full motion-reduce:[perspective:none]",
+          "motion-reduce:[&>div]:[transform:none!important]"
+        )}
+        style={{
+          perspective: "1600px",
+          // Bias left so the band still fills toward B while the right curves into A
+          perspectiveOrigin: "42% 48%",
+          ...dialTrackMask,
+        }}
+      >
+        <div
+          className={cn(
+            "flex flex-col will-change-transform",
+            // Dial wraps left→right: stronger yaw on desktop, softer on mobile
+            "[transform:rotateX(4deg)_rotateY(-6deg)_translateZ(-4px)]",
+            "md:[transform:rotateX(7deg)_rotateY(-16deg)_translateZ(-14px)]",
+            "lg:[transform:rotateX(9deg)_rotateY(-20deg)_translateZ(-18px)]",
+            "xl:[transform:rotateX(10deg)_rotateY(-22deg)_translateZ(-22px)]"
+          )}
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <MarqueeRows />
+        </div>
+      </div>
+      <DialBlurWalls />
+    </div>
+  )
+}
+
 function MarqueeRows({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col", className)}>
@@ -88,7 +172,7 @@ function MarqueeRows({ className }: { className?: string }) {
           key={i}
           reverse={row.reverse}
           repeat={6}
-          className="py-[calc(var(--gap)/2)] [--gap:0.375rem]"
+          className="py-[calc(var(--gap)/2)] [--gap:0.65rem] md:[--gap:0.85rem]"
           style={{ "--duration": row.duration } as React.CSSProperties}
         >
           {row.icons.map((item) => (
@@ -101,7 +185,8 @@ function MarqueeRows({ className }: { className?: string }) {
 }
 
 function BottomText({ className }: { className?: string }) {
-  const { heading, description, cta } = siteConfig.marquee
+  const { heading, description } = siteConfig.marquee
+  const { primary, secondary } = siteConfig.ctas
 
   return (
     <div
@@ -116,13 +201,21 @@ function BottomText({ className }: { className?: string }) {
       <p className="mt-3 max-w-lg text-base text-balance xs:text-lg text-muted-foreground md:text-lg 3xl:max-w-2xl 3xl:text-xl">
         {description}
       </p>
-      <Link
-        href={cta.href}
-        className={cn(buttonVariants({ size: "lg" }), "mt-6")}
-      >
-        {cta.label}
-        <ArrowRight data-icon="inline-end" />
-      </Link>
+      {/* Primary = contact, secondary = resume — same pairing as footer. */}
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <Link href={primary.href} className={cn(buttonVariants({ size: "lg" }))}>
+          {primary.label}
+          <ArrowRight data-icon="inline-end" />
+        </Link>
+        <Link
+          href={secondary.href}
+          target="_blank"
+          rel="noreferrer"
+          className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
+        >
+          {secondary.label}
+        </Link>
+      </div>
     </div>
   )
 }
@@ -137,8 +230,8 @@ export function IconMarquee({ top }: { top?: React.ReactNode }) {
         <div className="relative z-10 flex flex-col items-center px-6 text-center">
           {top}
         </div>
-        <div className={cn("relative -my-(--overlap) w-full", edgeFade)}>
-          <MarqueeRows />
+        <div className="relative -my-(--overlap) w-full">
+          <DialTrack />
           <ProgressiveBlur side="top" className="h-[50%] md:h-[42%]" />
           <ProgressiveBlur side="bottom" className="h-[50%] md:h-[42%]" />
         </div>
@@ -153,9 +246,7 @@ export function IconMarquee({ top }: { top?: React.ReactNode }) {
       className="relative w-full scroll-mt-20 py-6 [--tile:clamp(4rem,9svh,6rem)]"
     >
       <div className="relative mx-auto max-w-6xl overflow-hidden">
-        <div className={edgeFade}>
-          <MarqueeRows className="pb-24 md:pb-28" />
-        </div>
+        <DialTrack className="pb-24 md:pb-28" />
         <ProgressiveBlur side="bottom" className="h-3/4" />
         <BottomText className="absolute inset-x-0 bottom-0 pb-8" />
       </div>

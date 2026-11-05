@@ -41,6 +41,10 @@ import type { Project } from "@/lib/site-config"
 
 const neon = { from: "#ff2975", to: "#00b8d4" }
 
+/** Soft fade into the card title — Magic UI style. */
+const fadeUp =
+  "[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+
 /** Counts up every `ms` while the element is on screen, unless reduced motion is on. */
 function useTicker(ms: number) {
   const ref = useRef<HTMLDivElement>(null)
@@ -57,7 +61,7 @@ function useTicker(ms: number) {
   return { ref, tick, reduced }
 }
 
-/* YourOpoly: live check-in feed */
+/* YourOpoly: live check-in feed (wide card — like Magic UI Notifications) */
 
 const checkins: {
   title: string
@@ -74,28 +78,38 @@ const checkins: {
 ]
 
 function CheckinsVisual() {
-  const feed = Array.from({ length: 8 }, (_, round) =>
-    checkins.map((item) => ({ ...item, key: `${round}-${item.title}` }))
-  ).flat()
+  // One cycle of notifications — AnimatedList loops these forever while in view.
+  const feed = checkins.map((item) => ({ ...item, key: item.title }))
 
   return (
     <AnimatedList
       delay={1600}
-      className="absolute inset-x-4 top-4 mx-auto h-[300px] max-w-xl transition-transform duration-300 group-hover:scale-[1.02] md:inset-x-6"
+      maxItems={3}
+      className={cn(
+        "absolute inset-x-0 top-0 h-[58%] scale-[0.85] overflow-hidden border-none transition-all duration-300 ease-out group-hover:scale-90",
+        "origin-top pt-3 pr-2 pl-2",
+        fadeUp
+      )}
     >
       {feed.map(({ key, title, detail, points, icon: Icon, color }) => (
         <figure
           key={key}
-          className="flex w-full items-center gap-3 rounded-2xl border bg-background/80 p-3 shadow-sm backdrop-blur-sm"
+          className={cn(
+            "relative mx-auto flex min-h-fit w-full max-w-[400px] items-center gap-3 overflow-hidden rounded-2xl p-3",
+            "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+            "transform-gpu dark:bg-transparent dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md"
+          )}
         >
           <span
-            className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: `${color}22`, color }}
+            className="flex size-9 shrink-0 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: color, color: "#fff" }}
           >
-            <Icon className="size-5" />
+            <Icon className="size-4" />
           </span>
           <figcaption className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-sm font-medium">{title}</span>
+            <span className="truncate text-sm font-medium dark:text-white">
+              {title}
+            </span>
             <span className="text-xs text-muted-foreground">{detail}</span>
           </figcaption>
           {points && (
@@ -109,7 +123,7 @@ function CheckinsVisual() {
   )
 }
 
-/* Good Life Bingo: squares get marked until a line wins */
+/* Good Life Bingo: narrow card — board clips into the rounded glass edge */
 
 const bingoLines = [
   [0, 6, 12, 18, 24],
@@ -129,8 +143,20 @@ function BingoVisual() {
   const won = step === 5
 
   return (
-    <div ref={ref} className="flex h-full items-start justify-center pt-5">
-      <div className="grid grid-cols-5 gap-1.5">
+    <div
+      ref={ref}
+      className={cn(
+        "absolute top-6 right-4 origin-top scale-90 transition-all duration-300 ease-out group-hover:scale-100 lg:right-8",
+        fadeUp
+      )}
+    >
+      <div
+        className={cn(
+          "grid grid-cols-5 gap-1.5 rounded-xl border p-3",
+          "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+          "dark:bg-transparent dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md"
+        )}
+      >
         {"BINGO".split("").map((letter) => (
           <span
             key={letter}
@@ -182,10 +208,10 @@ function BeamNode({
         ref={nodeRef}
         className={cn(
           "flex items-center justify-center rounded-full border bg-background shadow-[0_0_20px_-12px_rgb(0_0_0/0.8)]",
-          large ? "size-16" : "size-11"
+          large ? "size-14" : "size-10"
         )}
       >
-        <Icon className={large ? "size-7" : "size-5"} />
+        <Icon className={large ? "size-6" : "size-4"} />
       </div>
       <span className="text-[0.65rem] font-medium tracking-wide text-muted-foreground uppercase">
         {label}
@@ -212,7 +238,10 @@ function TenantsVisual() {
   return (
     <div
       ref={container}
-      className="relative flex h-full min-h-64 items-center justify-between px-8 pt-4 pb-6"
+      className={cn(
+        "absolute top-4 right-2 flex h-[300px] w-full max-w-[600px] items-center justify-between overflow-hidden p-10 transition-all duration-300 ease-out group-hover:scale-105",
+        fadeUp
+      )}
     >
       <div className="flex flex-col gap-3">
         <BeamNode nodeRef={a} icon={Trophy} label="YourOpoly" />
@@ -230,7 +259,7 @@ function TenantsVisual() {
   )
 }
 
-/* E-commerce: products scrolling past with checkout status */
+/* E-commerce: marquee that bleeds past the rounded glass edges (yellow-arrow look) */
 
 const products: { name: string; price: string; icon: LucideIcon; color: string }[] = [
   { name: "Linen Shirt", price: "$48", icon: Shirt, color: "#f97316" },
@@ -243,19 +272,26 @@ const products: { name: string; price: string; icon: LucideIcon; color: string }
 
 function ProductCard({ name, price, icon: Icon, color }: (typeof products)[number]) {
   return (
-    <figure className="flex w-44 flex-col gap-2 rounded-2xl border bg-background p-3 shadow-sm transition-transform duration-300 hover:-translate-y-1">
+    <figure
+      className={cn(
+        "relative w-32 cursor-pointer overflow-hidden rounded-xl border p-4",
+        "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
+        "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+        "transform-gpu blur-[1px] transition-all duration-300 ease-out hover:blur-none"
+      )}
+    >
       <span
-        className="flex h-11 items-center justify-center rounded-xl"
+        className="mb-2 flex h-9 items-center justify-center rounded-lg"
         style={{ backgroundColor: `${color}1f`, color }}
       >
-        <Icon className="size-6" />
+        <Icon className="size-5" />
       </span>
-      <figcaption className="flex items-center justify-between gap-2 text-sm">
+      <figcaption className="flex items-center justify-between gap-1 text-sm">
         <span className="truncate font-medium">{name}</span>
-        <span className="font-mono text-muted-foreground">{price}</span>
+        <span className="font-mono text-xs text-muted-foreground">{price}</span>
       </figcaption>
-      <span className="flex items-center gap-1 text-[0.65rem] font-medium tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
-        <Check className="size-3" /> Paid via Stripe
+      <span className="mt-1 flex items-center gap-1 text-[0.6rem] font-medium tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
+        <Check className="size-2.5" /> Paid
       </span>
     </figure>
   )
@@ -263,26 +299,32 @@ function ProductCard({ name, price, icon: Icon, color }: (typeof products)[numbe
 
 function StorefrontVisual() {
   return (
-    <div className="flex h-full min-h-64 flex-col justify-center gap-1 py-2">
-      <Marquee pauseOnHover className="[--duration:32s] [--gap:0.75rem]">
-        {products.map((p) => (
-          <ProductCard key={p.name} {...p} />
-        ))}
-      </Marquee>
-      <Marquee reverse pauseOnHover className="[--duration:38s] [--gap:0.75rem]">
-        {[...products].reverse().map((p) => (
-          <ProductCard key={p.name} {...p} />
-        ))}
-      </Marquee>
-    </div>
+    <Marquee
+      pauseOnHover
+      className={cn(
+        "absolute top-10 [--duration:20s]",
+        "[mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]"
+      )}
+    >
+      {products.map((p) => (
+        <ProductCard key={p.name} {...p} />
+      ))}
+    </Marquee>
   )
 }
 
-/* Task board API: requests typed into a terminal */
+/* Task board API */
 
 function ApiVisual() {
   return (
-    <Terminal className="absolute inset-x-4 top-4 mx-auto max-w-2xl bg-background/90 md:inset-x-6">
+    <Terminal
+      className={cn(
+        "absolute top-4 -right-4 w-[min(100%,24rem)] max-w-[400px] scale-75 border transition-all duration-300 ease-out group-hover:scale-90",
+        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+        "dark:bg-background/90 dark:[border:1px_solid_rgba(255,255,255,.1)] dark:backdrop-blur-md",
+        fadeUp
+      )}
+    >
       <TypingAnimation className="text-xs">
         {"$ curl -H 'X-Tenant: acme' /api/tasks"}
       </TypingAnimation>
@@ -307,7 +349,7 @@ function ApiVisual() {
   )
 }
 
-/* Reservations: days get booked, a double-booking is rejected */
+/* Reservations calendar — clips into the right glass edge like Magic UI */
 
 const bookings: { day: number; conflict?: boolean }[] = [
   { day: 6 },
@@ -327,8 +369,16 @@ function CalendarVisual() {
   const booked = new Set(done.filter((b) => !b.conflict).map((b) => b.day))
 
   return (
-    <div ref={ref} className="flex h-full flex-col items-center gap-3 pt-5">
-      <div className="flex h-7 w-60 items-center justify-between">
+    <div
+      ref={ref}
+      className={cn(
+        "absolute top-10 -right-4 flex origin-top scale-75 flex-col gap-3 rounded-md border p-3 transition-all duration-300 ease-out group-hover:scale-90",
+        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+        "dark:bg-background dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md",
+        "[mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]"
+      )}
+    >
+      <div className="flex h-7 w-52 items-center justify-between">
         <span className="text-sm font-semibold">October 2026</span>
         <AnimatePresence mode="wait">
           {latest && (
@@ -355,7 +405,7 @@ function CalendarVisual() {
           )}
         </AnimatePresence>
       </div>
-      <div className="grid w-60 grid-cols-7 gap-1 text-center text-xs">
+      <div className="grid w-52 grid-cols-7 gap-1 text-center text-xs">
         {"SMTWTFS".split("").map((d, i) => (
           <span key={i} className="pb-1 text-muted-foreground">
             {d}

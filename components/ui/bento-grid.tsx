@@ -25,13 +25,36 @@ const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
   return (
     <div
       className={cn(
-        "grid w-full grid-cols-1 gap-4 *:min-w-0",
+        "grid w-full auto-rows-[22rem] grid-cols-3 gap-4",
         className
       )}
       {...props}
     >
       {children}
     </div>
+  )
+}
+
+function CardCta({
+  href,
+  cta,
+  className,
+}: {
+  href: string
+  cta: string
+  className?: string
+}) {
+  return (
+    <Button
+      variant="link"
+      size="sm"
+      className={cn("pointer-events-auto p-0", className)}
+      render={<a href={href} target="_blank" rel="noreferrer" />}
+      nativeButton={false}
+    >
+      {cta}
+      <ArrowRight data-icon="inline-end" />
+    </Button>
   )
 }
 
@@ -49,49 +72,48 @@ const BentoCard = ({
 }: BentoCardProps) => (
   <div
     className={cn(
-      "group relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card",
-      "[box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-      "transform-gpu dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
+      "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
+      "border border-black/10 bg-card",
+      "[box-shadow:inset_0_1px_0_rgba(255,255,255,1),0_1px_2px_rgba(0,0,0,.06),0_10px_20px_-8px_rgba(0,0,0,.12),0_28px_56px_-20px_rgba(0,0,0,.16)]",
+      "transform-gpu transition-shadow duration-300 hover:[box-shadow:inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(0,0,0,.07),0_16px_32px_-10px_rgba(0,0,0,.14),0_36px_64px_-22px_rgba(0,0,0,.18)]",
+      "dark:border-white/10 dark:bg-background dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:hover:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
       className
     )}
     {...props}
   >
-    <div
-      aria-hidden
-      className="relative min-h-64 flex-1 overflow-hidden mask-[linear-gradient(to_bottom,black_80%,transparent)]"
-    >
-      {background}
-    </div>
+    <div className="pointer-events-none absolute inset-0">{background}</div>
 
-    <div className="relative z-10 flex flex-col gap-1.5 p-6 pt-0">
-      <Icon className="mb-1 size-8 origin-left text-muted-foreground transition-transform duration-300 ease-in-out group-hover:scale-90" />
-      {eyebrow && (
-        <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-          {eyebrow}
-        </span>
-      )}
-      <h3 className="font-heading text-2xl font-semibold tracking-tight">
-        {name}
-      </h3>
-      <p className="max-w-lg text-base leading-relaxed text-muted-foreground">
-        {description}
-      </p>
-      {children}
+    <div className="relative z-10 mt-auto bg-gradient-to-t from-card via-card/95 to-transparent p-4 pt-12 dark:from-background dark:via-background/95">
+      <div className="pointer-events-none flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
+        <Icon className="h-10 w-10 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300" />
+        {eyebrow && (
+          <span className="font-mono text-[0.65rem] tracking-widest text-muted-foreground uppercase">
+            {eyebrow}
+          </span>
+        )}
+        <h3 className="text-xl font-semibold text-neutral-800 dark:text-neutral-300">
+          {name}
+        </h3>
+        <p className="max-w-lg text-sm text-neutral-500 md:text-base dark:text-neutral-400">
+          {description}
+        </p>
+        {children}
+      </div>
+
       {href && cta && (
-        <Button
-          variant="link"
-          size="sm"
-          className="mt-1 self-start p-0"
-          render={<a href={href} target="_blank" rel="noreferrer" />}
-          nativeButton={false}
-        >
-          {cta}
-          <ArrowRight data-icon="inline-end" />
-        </Button>
+        <div className="pointer-events-none flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden">
+          <CardCta href={href} cta={cta} />
+        </div>
       )}
     </div>
 
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-colors duration-300 group-hover:bg-foreground/[0.02]" />
+    {href && cta && (
+      <div className="pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex">
+        <CardCta href={href} cta={cta} />
+      </div>
+    )}
+
+    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3 group-hover:dark:bg-neutral-800/10" />
   </div>
 )
 
