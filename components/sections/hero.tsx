@@ -1,9 +1,13 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, Mail } from "lucide-react"
 
+import { AuroraText } from "@/components/ui/aurora-text"
 import { buttonVariants } from "@/components/ui/button"
+import { StaggerItem, StaggerReveal } from "@/components/ui/stagger-reveal"
 import { cn } from "@/lib/utils"
-import { siteConfig } from "@/lib/site-config"
+import { auroraColors, siteConfig } from "@/lib/site-config"
 
 export function HeroCtas({ className }: { className?: string }) {
   const { primary, secondary } = siteConfig.ctas
@@ -32,33 +36,69 @@ export function HeroCtas({ className }: { className?: string }) {
   )
 }
 
+function splitHeadline(headline: string): [string, string | null] {
+  const comma = headline.indexOf(",")
+  if (comma === -1) return [headline, null]
+  return [headline.slice(0, comma + 1), headline.slice(comma + 1).trim()]
+}
+
 export function HeroText({ showCtas = false }: { showCtas?: boolean }) {
   const { headline, description, name, role } = siteConfig
+  const [line1, line2] = splitHeadline(headline)
 
   return (
-    <>
-      <h1 className="max-w-4xl animate-in font-heading text-3xl font-semibold tracking-tight text-balance duration-700 fade-in slide-in-from-top-4 fill-mode-both xs:text-[2.5rem] xs:leading-tight md:text-[min(3.75rem,9svh)] md:leading-none 3xl:max-w-5xl 3xl:text-[min(4.5rem,9svh)]">
-        {headline}
-      </h1>
+    <StaggerReveal
+      delayChildren={0.3}
+      className="flex w-full max-w-5xl flex-col items-center px-1"
+    >
+      {/* Display — largest on the page */}
+      <StaggerItem
+        as="h1"
+        className="font-heading text-5xl font-semibold tracking-tight text-balance xs:text-6xl md:text-[clamp(3.5rem,9vw,5.5rem)] md:leading-[0.95]"
+      >
+        <AuroraText colors={auroraColors}>{name}</AuroraText>
+      </StaggerItem>
 
-      <p className="mt-4 max-w-2xl animate-in text-base text-balance text-muted-foreground delay-150 duration-700 fade-in slide-in-from-top-2 fill-mode-both xs:text-lg 3xl:max-w-3xl 3xl:text-xl">
+      <StaggerItem
+        as="p"
+        className="mt-3 font-mono text-[0.7rem] tracking-[0.2em] text-muted-foreground uppercase md:text-xs"
+      >
+        {role}
+      </StaggerItem>
+
+      {/* Lead — clearly under the name */}
+      <StaggerItem
+        as="p"
+        className="mt-7 max-w-3xl font-heading text-xl font-semibold tracking-tight text-balance xs:text-2xl md:mt-9 md:text-3xl md:leading-snug"
+      >
+        {line1}
+        {line2 ? (
+          <>
+            {" "}
+            {line2}
+          </>
+        ) : null}
+      </StaggerItem>
+
+      <StaggerItem
+        as="p"
+        className="mt-3 max-w-xl text-sm text-balance text-muted-foreground xs:text-base md:text-lg"
+      >
         {description}
-      </p>
-
-      <p className="mt-3 animate-in font-mono text-xs tracking-widest text-muted-foreground uppercase delay-300 duration-700 fade-in fill-mode-both">
-        {name} &middot; {role}
-      </p>
+      </StaggerItem>
 
       {showCtas ? (
-        <HeroCtas className="mt-6 animate-in delay-450 duration-700 fade-in fill-mode-both" />
+        <StaggerItem className="mt-6">
+          <HeroCtas />
+        </StaggerItem>
       ) : null}
-    </>
+    </StaggerReveal>
   )
 }
 
 export function Hero() {
   return (
-    <section className="mx-auto flex max-w-4xl flex-col items-center px-6 pt-10 pb-4 text-center md:pt-14">
+    <section className="mx-auto flex max-w-5xl flex-col items-center px-6 pt-10 pb-4 text-center md:pt-14">
       <HeroText showCtas />
     </section>
   )

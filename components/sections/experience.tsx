@@ -1,25 +1,69 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { GraduationCap } from "lucide-react"
-import { motion, useScroll, useSpring } from "motion/react"
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+} from "motion/react"
 
 import { SectionHeading } from "@/components/sections/section-heading"
 import { BlurFade } from "@/components/ui/blur-fade"
 import { education, experience, siteConfig } from "@/lib/site-config"
+import { cn } from "@/lib/utils"
+
+const jobVariants = {
+  hidden: { opacity: 0, y: 8, filter: "blur(4px)" },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      delay: i * 0.08,
+      duration: 0.45,
+      ease: "easeOut" as const,
+    },
+  }),
+}
 
 export function Experience() {
   const { heading, description } = siteConfig.experience
   const list = useRef<HTMLOListElement>(null)
+  const reduced = useReducedMotion()
+  const [revealed, setRevealed] = useState(reduced ? experience.length : -1)
+
   const { scrollYProgress } = useScroll({
     target: list,
     offset: ["start 75%", "end 60%"],
   })
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 })
 
+  const syncReveal = (value: number) => {
+    if (reduced) return
+    const next = Math.min(
+      experience.length - 1,
+      Math.floor(value * experience.length)
+    )
+    setRevealed((prev) => Math.max(prev, next))
+  }
+
+  useMotionValueEvent(scrollYProgress, "change", syncReveal)
+
+  useEffect(() => {
+    syncReveal(scrollYProgress.get())
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seed once from current scroll
+  }, [])
+
   return (
     <section id="experience" className="scroll-mt-16">
-      <SectionHeading heading={heading} description={description} />
+      <SectionHeading
+        heading={heading}
+        description={description}
+        size="display"
+      />
 
       <div className="mx-auto mt-12 max-w-3xl px-5 md:mt-16 md:px-6">
         <div className="relative pl-8 md:pl-12">
@@ -33,36 +77,77 @@ export function Experience() {
             className="absolute top-2 bottom-2 left-[7px] w-px origin-top bg-linear-to-b from-[#ff2975] to-[#00a3bd] md:left-[11px] dark:to-[#00FFF1]"
           />
           <ol ref={list} className="flex flex-col gap-12">
-            {experience.map((job) => (
-              <li key={job.company} className="relative">
-                <span
-                  aria-hidden
-                  className="absolute top-1.5 -left-8 size-[15px] rounded-full border-2 border-background bg-foreground md:-left-12 md:size-[23px] md:border-4"
-                />
-                <BlurFade inView direction="up" offset={16}>
-                  <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-                    {job.period} · {job.location}
-                  </span>
-                  <h3 className="mt-2 font-heading text-2xl font-semibold tracking-tight md:text-3xl">
-                    {job.role}
-                  </h3>
-                  <p className="mt-1 text-lg text-muted-foreground">
-                    {job.company}
-                  </p>
-                  <ul className="mt-4 flex flex-col gap-2 text-base leading-relaxed">
-                    {job.points.map((point) => (
-                      <li key={point} className="flex gap-3">
+            {experience.map((job, index) => {
+              const isRevealed = revealed >= index
+              return (
+                <li key={job.company} className="relative">
+                  <motion.span
+                    aria-hidden
+                    initial={false}
+                    animate={
+                      isRevealed
+                        ? { scale: [1, 1.25, 1], backgroundColor: undefined }
+                        : { scale: 1 }
+                    }
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className={cn(
+                      "absolute top-1.5 -left-8 size-[15px] rounded-full border-2 border-background md:-left-12 md:size-[23px] md:border-4",
+                      isRevealed
+                        ? "bg-linear-to-br from-[#ff2975] to-[#00a3bd] dark:to-[#00FFF1]"
+                        : "bg-muted-foreground/40"
+                    )}
+                  />
+                  <div className="flex flex-col">
+                    {(
+                      [
                         <span
-                          aria-hidden
-                          className="mt-2.5 size-1.5 shrink-0 rounded-full bg-muted-foreground"
-                        />
-                        {point}
-                      </li>
+                          key="meta"
+                          className="font-mono text-xs tracking-widest text-muted-foreground uppercase"
+                        >
+                          {job.period} · {job.location}
+                        </span>,
+                        <h3
+                          key="role"
+                          className="mt-2 font-heading text-xl font-semibold tracking-tight md:text-2xl"
+                        >
+                          {job.role}
+                        </h3>,
+                        <p
+                          key="company"
+                          className="mt-1 text-lg text-muted-foreground"
+                        >
+                          {job.company}
+                        </p>,
+                        <ul
+                          key="points"
+                          className="mt-4 flex flex-col gap-2 text-base leading-relaxed"
+                        >
+                          {job.points.map((point) => (
+                            <li key={point} className="flex gap-3">
+                              <span
+                                aria-hidden
+                                className="mt-2.5 size-1.5 shrink-0 rounded-full bg-muted-foreground"
+                              />
+                              {point}
+                            </li>
+                          ))}
+                        </ul>,
+                      ] as const
+                    ).map((node, i) => (
+                      <motion.div
+                        key={node.key}
+                        custom={i}
+                        initial={reduced ? "visible" : "hidden"}
+                        animate={isRevealed ? "visible" : "hidden"}
+                        variants={jobVariants}
+                      >
+                        {node}
+                      </motion.div>
                     ))}
-                  </ul>
-                </BlurFade>
-              </li>
-            ))}
+                  </div>
+                </li>
+              )
+            })}
           </ol>
         </div>
 

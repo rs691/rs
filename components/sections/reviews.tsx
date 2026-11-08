@@ -1,9 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import { Quote } from "lucide-react"
 
 import { SectionHeading } from "@/components/sections/section-heading"
+import { BorderBeam } from "@/components/ui/border-beam"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Marquee } from "@/components/ui/marquee"
+import { VelocityMarquee } from "@/components/ui/velocity-marquee"
 import { cn } from "@/lib/utils"
 import { reviews, siteConfig, type Review } from "@/lib/site-config"
 
@@ -14,21 +17,48 @@ const blurLayers = [
   { blur: "backdrop-blur-[8px]", stops: "transparent 60%, black 100%" },
 ]
 
-function ReviewCard({ quote, name, context }: Review) {
+const beamColors = [
+  { colorFrom: "#ff2975", colorTo: "#00FFF1" },
+  { colorFrom: "#a855f7", colorTo: "#22d3ee" },
+  { colorFrom: "#f97316", colorTo: "#ec4899" },
+  { colorFrom: "#00a3bd", colorTo: "#ff00aa" },
+] as const
+
+function ReviewCard({
+  quote,
+  name,
+  context,
+  colorIndex = 0,
+}: Review & { colorIndex?: number }) {
+  const beam = beamColors[colorIndex % beamColors.length]
+
   return (
     <Card
       size="sm"
       className={cn(
-        "w-72 shrink-0 rounded-2xl border-black/10 md:w-96 dark:border-white/10",
+        "relative w-72 shrink-0 overflow-hidden rounded-2xl border-black/10 md:w-96 dark:border-white/10",
         "shadow-[inset_0_1px_0_rgba(255,255,255,1),0_10px_28px_-10px_rgba(0,0,0,.14),0_22px_44px_-18px_rgba(0,0,0,.1)]",
-        "dark:shadow-none"
+        "dark:shadow-none",
+        "transition-[transform,box-shadow] duration-300 ease-out",
+        "hover:-translate-y-1.5 hover:z-10 hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_16px_36px_-12px_rgba(0,0,0,.2),0_28px_52px_-20px_rgba(0,0,0,.14)]",
+        "active:-translate-y-1",
+        "motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       )}
     >
-      <CardContent className="flex flex-col gap-3">
+      <BorderBeam
+        size={80}
+        duration={8}
+        borderWidth={1}
+        delay={colorIndex * 0.6}
+        initialOffset={colorIndex * 18}
+        colorFrom={beam.colorFrom}
+        colorTo={beam.colorTo}
+      />
+      <CardContent className="relative flex flex-col gap-3">
         <Quote className="size-5 text-muted-foreground" />
         <p className="text-base leading-relaxed">{quote}</p>
       </CardContent>
-      <CardFooter className="mt-auto flex-col items-start gap-0.5">
+      <CardFooter className="relative mt-auto flex-col items-start gap-0.5">
         <span className="font-medium">{name}</span>
         <span className="text-sm text-muted-foreground">{context}</span>
       </CardFooter>
@@ -106,25 +136,35 @@ export function Reviews() {
 
           <div className="relative mt-10 md:mt-14">
             <div className="flex flex-col gap-2 pb-36 mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] motion-reduce:overflow-x-auto motion-reduce:mask-none md:pb-44">
-              <Marquee
+              <VelocityMarquee
                 pauseOnHover
-                className="[--duration:45s] [--gap:1rem] md:hidden motion-reduce:[animation:none]"
+                baseSpeed={22}
+                boostSpeed={28}
+                gap="1rem"
+                className="md:hidden"
               >
                 {reviews.map((review, i) => (
-                  <ReviewCard key={i} {...review} />
+                  <ReviewCard key={i} {...review} colorIndex={i} />
                 ))}
-              </Marquee>
+              </VelocityMarquee>
               {rows.map((row, i) => (
-                <Marquee
+                <VelocityMarquee
                   key={i}
                   pauseOnHover
                   reverse={i === 1}
-                  className="[--duration:40s] [--gap:1.5rem] max-md:hidden motion-reduce:[animation:none]"
+                  baseSpeed={20}
+                  boostSpeed={26}
+                  gap="1.5rem"
+                  className="max-md:hidden"
                 >
                   {row.map((review, j) => (
-                    <ReviewCard key={j} {...review} />
+                    <ReviewCard
+                      key={j}
+                      {...review}
+                      colorIndex={i * row.length + j}
+                    />
                   ))}
-                </Marquee>
+                </VelocityMarquee>
               ))}
             </div>
 

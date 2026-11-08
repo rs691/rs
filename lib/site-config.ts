@@ -75,13 +75,16 @@ export type MarqueeRow = {
   reverse?: boolean
 }
 
+/** AuroraText palette for headings on solid page backgrounds. */
+export const auroraColors = ["#ff2975", "#a855f7", "#0070F3", "#00FFF1"]
+
 export const siteConfig = {
   name: "Robert Stewart",
   role: "Full-Stack Software Engineer",
   heroLayout: "overlay" as "overlay" | "stacked",
   headline: "I build production systems end to end, from mobile to cloud.",
   description:
-    "Multi-tenant apps shipped to the App Store and Google Play, with real-time backends, AWS infrastructure, and AI features built into live products.",
+    "App Store and Play releases, real-time backends, AWS, and AI in live products.",
   resumeHref: "/Resume.pdf",
   sections: [
     { label: "Home", href: "#top", icon: House },
@@ -97,23 +100,19 @@ export const siteConfig = {
   },
   marquee: {
     heading: "Tools I build with every day.",
-    description:
-      "Flutter and React on the front, Node.js and AWS behind it, AI wired into the middle.",
+    description: "Flutter, React, Node.js, AWS, and AI in the middle.",
   },
   projects: {
     heading: "Things I've shipped.",
-    description:
-      "Production apps, platforms, and demos, from App Store releases to multi-tenant APIs.",
+    description: "Apps, platforms, and APIs in production.",
   },
   reviews: {
     heading: "What tutoring looked like.",
-    description:
-      "Themes from mentoring 100+ CIS students at Bellevue University — debugging, design, and shipping fundamentals.",
+    description: "Themes from mentoring 100+ CIS students.",
   },
   experience: {
     heading: "Where I've worked.",
-    description:
-      "Shipping production software, teaching it, and studying the data behind it.",
+    description: "Building software, teaching it, studying the data behind it.",
   },
   footer: {
     heading: "Let's build something.",
@@ -204,7 +203,7 @@ export const projects: Project[] = [
   {
     title: "YourOpoly",
     description:
-      "Community rewards platform connecting players with local businesses through geo-validated QR check-ins, points, promotions, and live leaderboards.",
+      "Geo QR check-ins, rewards, and live leaderboards for local businesses.",
     stack: ["Flutter", "Node.js", "MySQL", "AWS ECS", "Redis", "Socket.IO", "Gemini API"],
     status: "Live App Store · Google Play",
     icon: Trophy,
@@ -264,7 +263,7 @@ export const projects: Project[] = [
   {
     title: "Multi-Tenant Task Board API",
     description:
-      "REST API that enforces tenant isolation at the ORM layer with EF Core global query filters, deployed to Azure by GitHub Actions.",
+      "EF Core tenant isolation with Azure CI/CD — live API docs on GitHub Actions.",
     stack: ["C#", "ASP.NET Core", "JWT", "Azure", "GitHub Actions"],
     status: "Live API · Azure",
     icon: SquareTerminal,

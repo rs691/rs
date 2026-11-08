@@ -7,8 +7,8 @@ import { BlurFade } from "@/components/ui/blur-fade"
 import { cn } from "@/lib/utils"
 import { projects, siteConfig, techIcon, type Project } from "@/lib/site-config"
 
-function StackLogos({ stack }: { stack: string[] }) {
-  const shown = stack.slice(0, 5)
+function StackLogos({ stack, limit = 5 }: { stack: string[]; limit?: number }) {
+  const shown = stack.slice(0, limit)
   const extra = stack.length - shown.length
 
   return (
@@ -71,6 +71,8 @@ const spans: Record<Project["visual"], string> = {
   bingo: "col-span-3 lg:col-span-2",
 }
 
+const narrowVisuals = new Set<Project["visual"]>(["checkins", "api", "calendar"])
+
 export function Projects() {
   const { heading, description } = siteConfig.projects
   const ordered = magicOrder
@@ -79,23 +81,29 @@ export function Projects() {
 
   return (
     <section id="projects" className="scroll-mt-16">
-      <SectionHeading heading={heading} description={description} />
+      <SectionHeading
+        heading={heading}
+        description={description}
+        size="display"
+      />
 
       <div className="mx-auto mt-12 max-w-5xl px-5 md:mt-16 md:px-6">
         <BentoGrid>
           {ordered.map((project, i) => {
             const link = project.links?.[0]
+            const compact = narrowVisuals.has(project.visual)
             return (
               <BlurFade
                 key={project.title}
                 inView
                 direction="up"
                 offset={20}
-                delay={(i % 2) * 0.08}
+                delay={0.2 + i * 0.08}
                 className={cn("h-full min-h-0", spans[project.visual])}
               >
                 <BentoCard
                   className="h-full"
+                  compact={compact}
                   name={project.title}
                   eyebrow={project.status}
                   description={project.description}
@@ -104,7 +112,7 @@ export function Projects() {
                   cta={link?.label}
                   background={<ProjectVisual visual={project.visual} />}
                 >
-                  <StackLogos stack={project.stack} />
+                  <StackLogos stack={project.stack} limit={compact ? 3 : 5} />
                 </BentoCard>
               </BlurFade>
             )

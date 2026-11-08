@@ -41,9 +41,13 @@ import type { Project } from "@/lib/site-config"
 
 const neon = { from: "#ff2975", to: "#00b8d4" }
 
-/** Soft fade into the card title — Magic UI style. */
+/** Soft fade into the card title — Magic UI style (stronger dissolve at bottom). */
 const fadeUp =
-  "[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+  "[mask-image:linear-gradient(to_top,transparent_0%,transparent_12%,#000_55%,#000_100%)]"
+
+/** Nested glass panes used inside bento demos. */
+const glassPane =
+  "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)] dark:bg-transparent dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md"
 
 /** Counts up every `ms` while the element is on screen, unless reduced motion is on. */
 function useTicker(ms: number) {
@@ -78,17 +82,16 @@ const checkins: {
 ]
 
 function CheckinsVisual() {
-  // One cycle of notifications — AnimatedList loops these forever while in view.
+  // Upper-pane feed — keep clear of the compact title band on narrow cards.
   const feed = checkins.map((item) => ({ ...item, key: item.title }))
 
   return (
     <AnimatedList
       delay={1600}
-      maxItems={3}
+      maxItems={2}
       className={cn(
-        "absolute inset-x-0 top-0 h-[58%] scale-[0.85] overflow-hidden border-none transition-all duration-300 ease-out group-hover:scale-90",
-        "origin-top pt-3 pr-2 pl-2",
-        fadeUp
+        "absolute inset-x-0 top-0 h-[52%] origin-top scale-[0.8] overflow-hidden border-none px-2 pt-3 transition-all duration-300 ease-out group-hover:scale-[0.88]",
+        "[mask-image:linear-gradient(to_top,transparent_0%,transparent_18%,#000_70%,#000_100%)]"
       )}
     >
       {feed.map(({ key, title, detail, points, icon: Icon, color }) => (
@@ -96,8 +99,8 @@ function CheckinsVisual() {
           key={key}
           className={cn(
             "relative mx-auto flex min-h-fit w-full max-w-[400px] items-center gap-3 overflow-hidden rounded-2xl p-3",
-            "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-            "transform-gpu dark:bg-transparent dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md"
+            "transform-gpu",
+            glassPane
           )}
         >
           <span
@@ -146,17 +149,11 @@ function BingoVisual() {
     <div
       ref={ref}
       className={cn(
-        "absolute top-6 right-4 origin-top scale-90 transition-all duration-300 ease-out group-hover:scale-100 lg:right-8",
+        "absolute top-4 right-2 origin-top scale-75 transition-all duration-300 ease-out group-hover:scale-90 lg:right-8",
         fadeUp
       )}
     >
-      <div
-        className={cn(
-          "grid grid-cols-5 gap-1.5 rounded-xl border p-3",
-          "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-          "dark:bg-transparent dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md"
-        )}
-      >
+      <div className={cn("grid grid-cols-5 gap-1.5 rounded-xl border p-3", glassPane)}>
         {"BINGO".split("").map((letter) => (
           <span
             key={letter}
@@ -240,7 +237,7 @@ function TenantsVisual() {
       ref={container}
       className={cn(
         "absolute top-4 right-2 flex h-[300px] w-full max-w-[600px] items-center justify-between overflow-hidden p-10 transition-all duration-300 ease-out group-hover:scale-105",
-        fadeUp
+        "[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
       )}
     >
       <div className="flex flex-col gap-3">
@@ -319,10 +316,10 @@ function ApiVisual() {
   return (
     <Terminal
       className={cn(
-        "absolute top-4 -right-4 w-[min(100%,24rem)] max-w-[400px] scale-75 border transition-all duration-300 ease-out group-hover:scale-90",
-        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-        "dark:bg-background/90 dark:[border:1px_solid_rgba(255,255,255,.1)] dark:backdrop-blur-md",
-        fadeUp
+        "absolute top-3 -right-6 w-[min(100%,22rem)] max-w-[340px] origin-top scale-[0.68] border transition-all duration-300 ease-out group-hover:scale-[0.78]",
+        glassPane,
+        "dark:bg-background/90",
+        "[mask-image:linear-gradient(to_top,transparent_0%,transparent_22%,#000_75%,#000_100%)]"
       )}
     >
       <TypingAnimation className="text-xs">
@@ -335,15 +332,11 @@ function ApiVisual() {
         {"$ curl -H 'X-Tenant: globex' /api/tasks/42"}
       </TypingAnimation>
       <AnimatedSpan className="text-xs text-rose-600 dark:text-rose-400">
-        ✖ 404 Not Found · hidden by global query filter
+        ✖ 404 · hidden by query filter
       </AnimatedSpan>
       <TypingAnimation className="text-xs">{"$ dotnet test"}</TypingAnimation>
       <AnimatedSpan className="text-xs text-emerald-600 dark:text-emerald-400">
-        ✔ All passed · tenant isolation suite
-      </AnimatedSpan>
-      <TypingAnimation className="text-xs">{"$ git push origin main"}</TypingAnimation>
-      <AnimatedSpan className="text-xs text-sky-600 dark:text-sky-400">
-        ✔ GitHub Actions · deployed to Azure
+        ✔ Tenant isolation suite passed
       </AnimatedSpan>
     </Terminal>
   )
@@ -372,9 +365,8 @@ function CalendarVisual() {
     <div
       ref={ref}
       className={cn(
-        "absolute top-10 -right-4 flex origin-top scale-75 flex-col gap-3 rounded-md border p-3 transition-all duration-300 ease-out group-hover:scale-90",
-        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-        "dark:bg-background dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:backdrop-blur-md",
+        "absolute top-10 right-0 flex origin-top scale-75 flex-col gap-3 rounded-md border p-3 transition-all duration-300 ease-out group-hover:scale-90",
+        glassPane,
         "[mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]"
       )}
     >

@@ -19,6 +19,8 @@ interface BentoCardProps extends Omit<ComponentPropsWithoutRef<"div">, "children
   href?: string
   cta?: string
   children?: ReactNode
+  /** Narrow cards: less copy chrome so the animation keeps the upper pane. */
+  compact?: boolean
 }
 
 const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
@@ -68,33 +70,66 @@ const BentoCard = ({
   href,
   cta,
   children,
+  compact = false,
   ...props
 }: BentoCardProps) => (
   <div
     className={cn(
       "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
-      "border border-black/10 bg-card",
-      "[box-shadow:inset_0_1px_0_rgba(255,255,255,1),0_1px_2px_rgba(0,0,0,.06),0_10px_20px_-8px_rgba(0,0,0,.12),0_28px_56px_-20px_rgba(0,0,0,.16)]",
-      "transform-gpu transition-shadow duration-300 hover:[box-shadow:inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(0,0,0,.07),0_16px_32px_-10px_rgba(0,0,0,.14),0_36px_64px_-22px_rgba(0,0,0,.18)]",
-      "dark:border-white/10 dark:bg-background dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:hover:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
+      "border border-black/8 bg-card",
+      "[box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.04),0_12px_24px_-8px_rgba(0,0,0,.08)]",
+      "dark:border-white/10 dark:bg-neutral-950",
+      "dark:[box-shadow:0_0_0_1px_rgba(255,255,255,.04),0_-20px_80px_-20px_#ffffff1f_inset,0_0_40px_-12px_rgba(255,255,255,.08)]",
+      "transform-gpu transition-shadow duration-300",
+      "hover:[box-shadow:0_0_0_1px_rgba(0,0,0,.04),0_4px_8px_rgba(0,0,0,.05),0_16px_32px_-10px_rgba(0,0,0,.1)]",
+      "dark:hover:[box-shadow:0_0_0_1px_rgba(255,255,255,.06),0_-20px_80px_-20px_#ffffff1f_inset,0_0_56px_-10px_rgba(255,255,255,.12)]",
       className
     )}
     {...props}
   >
     <div className="pointer-events-none absolute inset-0">{background}</div>
 
-    <div className="relative z-10 mt-auto bg-gradient-to-t from-card via-card/95 to-transparent p-4 pt-12 dark:from-background dark:via-background/95">
-      <div className="pointer-events-none flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
-        <Icon className="h-10 w-10 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300" />
+    <div
+      className={cn(
+        "relative z-10 mt-auto bg-gradient-to-t from-card to-transparent dark:from-neutral-950",
+        compact
+          ? "via-card/95 from-40% px-3 pt-16 pb-3 dark:via-neutral-950/95"
+          : "via-card/90 p-4 pt-12 dark:via-neutral-950/90"
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none flex transform-gpu flex-col transition-all duration-300 lg:group-hover:-translate-y-10",
+          compact ? "gap-0.5" : "gap-1"
+        )}
+      >
+        <Icon
+          className={cn(
+            "origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300",
+            compact ? "h-8 w-8" : "h-12 w-12"
+          )}
+        />
         {eyebrow && (
           <span className="font-mono text-[0.65rem] tracking-widest text-muted-foreground uppercase">
             {eyebrow}
           </span>
         )}
-        <h3 className="text-xl font-semibold text-neutral-800 dark:text-neutral-300">
+        <h3
+          className={cn(
+            "font-semibold text-neutral-800 dark:text-neutral-300",
+            compact ? "text-lg" : "text-xl"
+          )}
+        >
           {name}
         </h3>
-        <p className="max-w-lg text-sm text-neutral-500 md:text-base dark:text-neutral-400">
+        <p
+          className={cn(
+            "text-neutral-500 dark:text-neutral-400",
+            compact
+              ? "line-clamp-2 text-sm leading-snug"
+              : "max-w-lg text-base"
+          )}
+        >
           {description}
         </p>
         {children}
