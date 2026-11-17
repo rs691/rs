@@ -1,5 +1,8 @@
 import { ProjectVisual } from "@/components/sections/project-visuals"
-import { SectionHeading } from "@/components/sections/section-heading"
+import {
+  SectionHeading,
+  sectionBodyClass,
+} from "@/components/sections/section-heading"
 import { TechLogo } from "@/components/sections/tech-logo"
 import { Badge } from "@/components/ui/badge"
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid"
@@ -80,14 +83,15 @@ export function Projects() {
     .filter((p): p is Project => Boolean(p))
 
   return (
-    <section id="projects" className="scroll-mt-16">
-      <SectionHeading
-        heading={heading}
-        description={description}
-        size="display"
-      />
+    <section id="projects" className="scroll-mt-24">
+      <SectionHeading heading={heading} description={description} />
 
-      <div className="mx-auto mt-12 max-w-5xl px-5 md:mt-16 md:px-6">
+      <div
+        className={cn(
+          "mx-auto max-w-5xl px-5 md:px-6",
+          sectionBodyClass
+        )}
+      >
         <BentoGrid>
           {ordered.map((project, i) => {
             const link = project.links?.[0]

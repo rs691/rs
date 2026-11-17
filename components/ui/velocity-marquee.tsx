@@ -123,6 +123,20 @@ export function VelocityMarquee({
     return () => cancelAnimationFrame(rafRef.current)
   }, [baseSpeed, reduced, tick])
 
+  // Static strip when motion is reduced — no loop copy, no rAF transform.
+  if (reduced) {
+    return (
+      <div
+        className={cn("flex overflow-x-auto p-2", className)}
+        style={{ ...style, ["--gap" as string]: gap }}
+      >
+        <div className="flex shrink-0" style={{ gap: "var(--gap)" }}>
+          {children}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       className={cn("group flex overflow-hidden p-2", className)}

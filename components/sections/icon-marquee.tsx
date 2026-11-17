@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
+import { SectionHeading } from "@/components/sections/section-heading"
 import { TechLogo } from "@/components/sections/tech-logo"
 import { BlurFade } from "@/components/ui/blur-fade"
 import { buttonVariants } from "@/components/ui/button"
@@ -134,11 +135,13 @@ function DialBlurWalls() {
  * Fluid dial pose keyed to viewport width (no lg/xl jumps).
  * Soft on mobile → peaks around the ≤1023 sweet spot → eases off on wide
  * screens so the same yaw doesn't look crooked on a wider band.
+ * Mild scale(1.03) + slight rotateY nudge so the front of the band reads closer.
  */
 const dialTransform =
   "rotateX(calc(4deg + 3deg * min(1, max(0, (100vw - 390px) / 480px)) - 1.5deg * min(1, max(0, (100vw - 1024px) / 500px)))) " +
-  "rotateY(calc(-6deg - 10deg * min(1, max(0, (100vw - 390px) / 480px)) + 6deg * min(1, max(0, (100vw - 1024px) / 500px)))) " +
-  "translateZ(calc(-4px - 10px * min(1, max(0, (100vw - 390px) / 480px)) + 5px * min(1, max(0, (100vw - 1024px) / 500px))))"
+  "rotateY(calc(-8deg - 10deg * min(1, max(0, (100vw - 390px) / 480px)) + 6deg * min(1, max(0, (100vw - 1024px) / 500px)))) " +
+  "translateZ(calc(-4px - 10px * min(1, max(0, (100vw - 390px) / 480px)) + 5px * min(1, max(0, (100vw - 1024px) / 500px)))) " +
+  "scale(1.03)"
 
 function DialTrack({ className }: { className?: string }) {
   return (
@@ -151,8 +154,8 @@ function DialTrack({ className }: { className?: string }) {
         style={{
           // Wider viewports get more perspective so the band reads flatter
           perspective: "clamp(1200px, 110vw, 2200px)",
-          // Bias left so the band still fills toward B while the right curves into A
-          perspectiveOrigin: "42% 48%",
+          // Slightly more centered so mild scale reads as “front closer”
+          perspectiveOrigin: "46% 48%",
           ...dialTrackMask,
         }}
       >
@@ -193,40 +196,31 @@ function BottomText({ className }: { className?: string }) {
   const { primary, secondary } = siteConfig.ctas
 
   return (
-    <StaggerReveal
-      inView
-      className={cn(
-        "z-10 flex flex-col items-center px-6 text-center",
-        className
-      )}
-    >
-      <StaggerItem
-        as="h2"
-        className="max-w-2xl font-heading text-2xl font-semibold tracking-tight text-balance text-foreground xs:text-3xl md:text-4xl"
+    <div className={cn("z-10 flex flex-col items-center", className)}>
+      <SectionHeading heading={heading} description={description} />
+      <StaggerReveal
+        inView
+        className="mt-10 flex justify-center md:mt-12"
       >
-        {heading}
-      </StaggerItem>
-      <StaggerItem
-        as="p"
-        className="mt-3 max-w-md text-sm text-balance text-muted-foreground xs:text-base"
-      >
-        {description}
-      </StaggerItem>
-      <StaggerItem className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link href={primary.href} className={cn(buttonVariants({ size: "lg" }))}>
-          {primary.label}
-          <ArrowRight data-icon="inline-end" />
-        </Link>
-        <Link
-          href={secondary.href}
-          target="_blank"
-          rel="noreferrer"
-          className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
-        >
-          {secondary.label}
-        </Link>
-      </StaggerItem>
-    </StaggerReveal>
+        <StaggerItem className="flex flex-col items-center gap-4 px-6 xs:flex-row xs:gap-5 md:gap-6">
+          <Link
+            href={primary.href}
+            className={cn(buttonVariants({ size: "lg" }))}
+          >
+            {primary.label}
+            <ArrowRight data-icon="inline-end" />
+          </Link>
+          <Link
+            href={secondary.href}
+            target="_blank"
+            rel="noreferrer"
+            className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
+          >
+            {secondary.label}
+          </Link>
+        </StaggerItem>
+      </StaggerReveal>
+    </div>
   )
 }
 
@@ -247,7 +241,7 @@ export function IconMarquee({ top }: { top?: React.ReactNode }) {
     return (
       <section
         id="stack"
-        className="flex flex-1 flex-col justify-center overflow-hidden pt-14 [--overlap:4.5rem] [--tile:clamp(3.5rem,min(10svh,20vw),10rem)] md:pt-20 md:[--overlap:clamp(3rem,9svh,8rem)]"
+        className="flex flex-1 flex-col justify-center overflow-hidden pt-16 [--overlap:4.5rem] [--tile:clamp(3.5rem,min(10svh,20vw),10rem)] md:pt-24 md:[--overlap:clamp(3rem,9svh,8rem)]"
       >
         <div className="relative z-10 flex flex-col items-center px-6 text-center">
           {top}

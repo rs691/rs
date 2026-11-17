@@ -12,15 +12,20 @@ import {
   BookOpen,
   Check,
   Coffee,
+  CreditCard,
+  Eye,
+  EyeOff,
   Footprints,
   Glasses,
   Grid3x3,
   Headphones,
   KeyRound,
   Mail,
+  Package,
   Pizza,
   Shield,
   Shirt,
+  ShoppingCart,
   Sparkles,
   Store,
   Trophy,
@@ -37,7 +42,11 @@ import {
   TypingAnimation,
 } from "@/components/ui/terminal"
 import { cn } from "@/lib/utils"
-import type { Project } from "@/lib/site-config"
+import {
+  ecommerceBentoVariant,
+  type EcommerceBentoVariant,
+  type Project,
+} from "@/lib/site-config"
 
 const neon = { from: "#ff2975", to: "#00b8d4" }
 
@@ -149,7 +158,7 @@ function BingoVisual() {
     <div
       ref={ref}
       className={cn(
-        "absolute top-4 right-2 origin-top scale-75 transition-all duration-300 ease-out group-hover:scale-90 lg:right-8",
+        "absolute top-4 right-12 origin-top scale-[0.84] transition-all duration-300 ease-out group-hover:scale-[0.92] md:right-20 lg:right-24",
         fadeUp
       )}
     >
@@ -256,9 +265,14 @@ function TenantsVisual() {
   )
 }
 
-/* E-commerce: marquee that bleeds past the rounded glass edges (yellow-arrow look) */
+/* E-commerce bento — swap via `ecommerceBentoVariant` in site-config */
 
-const products: { name: string; price: string; icon: LucideIcon; color: string }[] = [
+const products: {
+  name: string
+  price: string
+  icon: LucideIcon
+  color: string
+}[] = [
   { name: "Linen Shirt", price: "$48", icon: Shirt, color: "#f97316" },
   { name: "Field Watch", price: "$129", icon: Watch, color: "#0ea5e9" },
   { name: "Headphones", price: "$199", icon: Headphones, color: "#8b5cf6" },
@@ -267,7 +281,53 @@ const products: { name: string; price: string; icon: LucideIcon; color: string }
   { name: "Sunglasses", price: "$35", icon: Glasses, color: "#eab308" },
 ]
 
-function ProductCard({ name, price, icon: Icon, color }: (typeof products)[number]) {
+const checkoutEvents: {
+  title: string
+  detail: string
+  amount?: string
+  icon: LucideIcon
+  color: string
+}[] = [
+  {
+    title: "Cart updated",
+    detail: "Linen Shirt · qty 1",
+    amount: "$48",
+    icon: ShoppingCart,
+    color: "#f97316",
+  },
+  {
+    title: "Stripe Checkout",
+    detail: "Session started",
+    icon: CreditCard,
+    color: "#6366f1",
+  },
+  {
+    title: "Payment confirmed",
+    detail: "visa ···· 4242",
+    amount: "+$48",
+    icon: Check,
+    color: "#10b981",
+  },
+  {
+    title: "Order #1042",
+    detail: "Fulfilled · shipped",
+    icon: Package,
+    color: "#0ea5e9",
+  },
+  {
+    title: "AI product copy",
+    detail: "Copilot draft ready",
+    icon: Sparkles,
+    color: "#a855f7",
+  },
+]
+
+function ProductCard({
+  name,
+  price,
+  icon: Icon,
+  color,
+}: (typeof products)[number]) {
   return (
     <figure
       className={cn(
@@ -294,7 +354,56 @@ function ProductCard({ name, price, icon: Icon, color }: (typeof products)[numbe
   )
 }
 
-function StorefrontVisual() {
+/** 1 — Checkout pulse (default): cart → Stripe → paid feed */
+function CheckoutVisual() {
+  const feed = checkoutEvents.map((item) => ({ ...item, key: item.title }))
+
+  return (
+    <AnimatedList
+      delay={1500}
+      maxItems={3}
+      className={cn(
+        "absolute inset-x-0 top-0 h-[58%] origin-top scale-[0.82] overflow-hidden border-none px-3 pt-4 transition-all duration-300 ease-out group-hover:scale-[0.9]",
+        "[mask-image:linear-gradient(to_top,transparent_0%,transparent_14%,#000_65%,#000_100%)]"
+      )}
+    >
+      {feed.map(({ key, title, detail, amount, icon: Icon, color }) => (
+        <figure
+          key={key}
+          className={cn(
+            "relative mx-auto flex min-h-fit w-full max-w-[420px] items-center gap-3 overflow-hidden rounded-2xl p-3",
+            "transform-gpu",
+            glassPane
+          )}
+        >
+          <span
+            className="flex size-9 shrink-0 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: color, color: "#fff" }}
+          >
+            <Icon className="size-4" />
+          </span>
+          <figcaption className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-sm font-medium dark:text-white">
+              {title}
+            </span>
+            <span className="text-xs text-muted-foreground">{detail}</span>
+          </figcaption>
+          {amount ? (
+            <span
+              className="font-mono text-sm font-semibold"
+              style={{ color }}
+            >
+              {amount}
+            </span>
+          ) : null}
+        </figure>
+      ))}
+    </AnimatedList>
+  )
+}
+
+/** 2 — Original product marquee shelf */
+function MarqueeVisual() {
   return (
     <Marquee
       pauseOnHover
@@ -308,6 +417,151 @@ function StorefrontVisual() {
       ))}
     </Marquee>
   )
+}
+
+const copilotLines = [
+  { role: "you", text: "Draft a collection blurb for linen shirts." },
+  {
+    role: "ai",
+    text: "Soft layers for warmer days — washed linen in three neutrals.",
+  },
+  { role: "you", text: "Tighten for the PDP hero." },
+  {
+    role: "ai",
+    text: "Breathable linen. Everyday polish. Ships in 2 days.",
+  },
+] as const
+
+/** 3 — AI design/admin copilot chat strip */
+function CopilotVisual() {
+  const { ref, tick, reduced } = useTicker(2200)
+  const visible = reduced
+    ? copilotLines.length
+    : Math.min(copilotLines.length, (tick % (copilotLines.length + 1)) || 1)
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "absolute top-6 right-5 left-auto w-[min(100%,22rem)] origin-top scale-[0.92] transition-all duration-300 ease-out group-hover:scale-100 xs:w-[min(100%,24rem)] md:right-8 md:w-[26rem]",
+        fadeUp
+      )}
+    >
+      <div
+        className={cn(
+          "flex flex-col gap-2 rounded-2xl border p-3",
+          glassPane
+        )}
+      >
+        <div className="mb-1 flex items-center gap-2 text-[0.65rem] font-medium tracking-wide text-muted-foreground uppercase">
+          <Sparkles className="size-3.5 text-violet-500" />
+          Design copilot
+        </div>
+        <AnimatePresence initial={false}>
+          {copilotLines.slice(0, visible).map((line) => (
+            <motion.div
+              key={line.text}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={cn(
+                "max-w-[90%] rounded-xl px-3 py-2 text-xs leading-relaxed",
+                line.role === "you"
+                  ? "ml-auto bg-foreground text-background"
+                  : "mr-auto bg-muted text-foreground"
+              )}
+            >
+              {line.text}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+/** 4 — RLS gate: anon empty vs owner sees orders */
+function RlsVisual() {
+  const { ref, tick, reduced } = useTicker(2800)
+  const owner = reduced ? true : tick % 2 === 1
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "absolute top-8 right-4 left-4 origin-top scale-[0.9] transition-all duration-300 ease-out group-hover:scale-[0.98] md:right-10",
+        fadeUp
+      )}
+    >
+      <div className={cn("overflow-hidden rounded-2xl border p-4", glassPane)}>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <span className="text-[0.65rem] font-medium tracking-wide text-muted-foreground uppercase">
+            Postgres RLS
+          </span>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.65rem] font-medium",
+              owner
+                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                : "bg-muted text-muted-foreground"
+            )}
+          >
+            {owner ? (
+              <Eye className="size-3" />
+            ) : (
+              <EyeOff className="size-3" />
+            )}
+            {owner ? "owner" : "anon"}
+          </span>
+        </div>
+        <AnimatePresence mode="wait">
+          {owner ? (
+            <motion.ul
+              key="owner"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="flex flex-col gap-2"
+            >
+              {checkoutEvents.slice(0, 3).map((row) => (
+                <li
+                  key={row.title}
+                  className="flex items-center justify-between gap-2 rounded-lg bg-muted/50 px-2.5 py-2 text-xs"
+                >
+                  <span className="truncate font-medium">{row.title}</span>
+                  <span className="font-mono text-muted-foreground">
+                    {row.amount ?? "—"}
+                  </span>
+                </li>
+              ))}
+            </motion.ul>
+          ) : (
+            <motion.p
+              key="anon"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-xs text-muted-foreground"
+            >
+              No rows — policy blocked
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+const storefrontVariants: Record<EcommerceBentoVariant, () => React.ReactNode> =
+  {
+    checkout: CheckoutVisual,
+    marquee: MarqueeVisual,
+    copilot: CopilotVisual,
+    rls: RlsVisual,
+  }
+
+function StorefrontVisual() {
+  const Visual = storefrontVariants[ecommerceBentoVariant]
+  return <Visual />
 }
 
 /* Task board API */

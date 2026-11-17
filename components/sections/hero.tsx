@@ -3,6 +3,10 @@
 import Link from "next/link"
 import { ArrowRight, Mail } from "lucide-react"
 
+import {
+  brandDescriptionClass,
+  brandHeadingClass,
+} from "@/components/sections/section-heading"
 import { AuroraText } from "@/components/ui/aurora-text"
 import { buttonVariants } from "@/components/ui/button"
 import { StaggerItem, StaggerReveal } from "@/components/ui/stagger-reveal"
@@ -20,7 +24,7 @@ export function HeroCtas({ className }: { className?: string }) {
       )}
     >
       <Link href={primary.href} className={cn(buttonVariants({ size: "lg" }))}>
-        <Mail data-icon="inline-start" />
+        <Mail data-icon="inline-start" aria-hidden />
         {primary.label}
       </Link>
       <Link
@@ -30,7 +34,7 @@ export function HeroCtas({ className }: { className?: string }) {
         className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
       >
         {secondary.label}
-        <ArrowRight data-icon="inline-end" />
+        <ArrowRight data-icon="inline-end" aria-hidden />
       </Link>
     </div>
   )
@@ -51,25 +55,20 @@ export function HeroText({ showCtas = false }: { showCtas?: boolean }) {
       delayChildren={0.3}
       className="flex w-full max-w-5xl flex-col items-center px-1"
     >
-      {/* Display — largest on the page */}
-      <StaggerItem
-        as="h1"
-        className="font-heading text-5xl font-semibold tracking-tight text-balance xs:text-6xl md:text-[clamp(3.5rem,9vw,5.5rem)] md:leading-[0.95]"
-      >
+      <StaggerItem as="h1" className={brandHeadingClass}>
         <AuroraText colors={auroraColors}>{name}</AuroraText>
       </StaggerItem>
 
       <StaggerItem
         as="p"
-        className="mt-3 font-mono text-[0.7rem] tracking-[0.2em] text-muted-foreground uppercase md:text-xs"
+        className="mt-4 font-mono text-[0.7rem] tracking-[0.2em] text-muted-foreground uppercase md:mt-5 md:text-xs"
       >
         {role}
       </StaggerItem>
 
-      {/* Lead — clearly under the name */}
       <StaggerItem
         as="p"
-        className="mt-7 max-w-3xl font-heading text-xl font-semibold tracking-tight text-balance xs:text-2xl md:mt-9 md:text-3xl md:leading-snug"
+        className="mt-8 max-w-3xl font-heading text-xl font-semibold tracking-tight text-balance xs:text-2xl md:mt-10 md:text-3xl md:leading-snug"
       >
         {line1}
         {line2 ? (
@@ -80,15 +79,12 @@ export function HeroText({ showCtas = false }: { showCtas?: boolean }) {
         ) : null}
       </StaggerItem>
 
-      <StaggerItem
-        as="p"
-        className="mt-3 max-w-xl text-sm text-balance text-muted-foreground xs:text-base md:text-lg"
-      >
+      <StaggerItem as="p" className={cn(brandDescriptionClass, "mt-4 md:mt-5")}>
         {description}
       </StaggerItem>
 
       {showCtas ? (
-        <StaggerItem className="mt-6">
+        <StaggerItem className="mt-8">
           <HeroCtas />
         </StaggerItem>
       ) : null}
@@ -98,7 +94,7 @@ export function HeroText({ showCtas = false }: { showCtas?: boolean }) {
 
 export function Hero() {
   return (
-    <section className="mx-auto flex max-w-5xl flex-col items-center px-6 pt-10 pb-4 text-center md:pt-14">
+    <section className="mx-auto flex max-w-5xl flex-col items-center px-6 pt-16 pb-4 text-center md:pt-20">
       <HeroText showCtas />
     </section>
   )

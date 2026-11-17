@@ -1,16 +1,23 @@
+"use client"
+
+import { BlurFade } from "@/components/ui/blur-fade"
 import { NumberTicker } from "@/components/ui/number-ticker"
 import { stats } from "@/lib/site-config"
 
 export function Stats() {
   return (
     <section aria-label="By the numbers" className="px-5 md:px-6">
-      <dl className="mx-auto grid max-w-5xl grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
-        {stats.map((stat) => (
-          <div
+      <dl className="mx-auto grid max-w-5xl grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4 md:gap-y-12">
+        {stats.map((stat, i) => (
+          <BlurFade
             key={stat.label}
-            className="flex flex-col items-center gap-2 text-center"
+            inView
+            direction="up"
+            offset={12}
+            delay={i * 0.08}
+            className="flex flex-col items-center gap-3 text-center"
           >
-            <dt className="order-last max-w-40 text-sm text-balance text-muted-foreground">
+            <dt className="order-last max-w-40 text-sm text-balance text-muted-foreground md:text-base">
               {stat.label}
             </dt>
             <dd className="font-heading text-5xl font-semibold tracking-tight md:text-6xl">
@@ -22,7 +29,7 @@ export function Stats() {
               />
               {stat.suffix}
             </dd>
-          </div>
+          </BlurFade>
         ))}
       </dl>
     </section>

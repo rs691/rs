@@ -10,10 +10,16 @@ const nextConfig: NextConfig = {
   // Set by GitHub Actions configure-pages (e.g. "/rs" for project Pages).
   basePath: basePath || undefined,
   assetPrefix: basePath || undefined,
+  // Expose to client so raw <a>/media paths can prefix the Pages basePath.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   images: {
     unoptimized: true,
   },
   trailingSlash: true,
+  // Hide the Next.js route indicator so it doesn’t cover the scroll dial.
+  devIndicators: false,
   // Keep this package as the Turbopack root (parent dirs may have other lockfiles).
   turbopack: {
     root: rootDir,

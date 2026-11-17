@@ -1,7 +1,14 @@
 "use client"
 
 import { useEffect, useState, useSyncExternalStore } from "react"
-import { FileText } from "lucide-react"
+import { FileText, Handshake } from "lucide-react"
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react"
 import { useTheme } from "next-themes"
 import GithubOriginal from "devicons-react/icons/GithubOriginal"
 import LinkedinPlain from "devicons-react/icons/LinkedinPlain"
@@ -65,14 +72,18 @@ function DockLink({
   label,
   active,
   external,
+  side = "left",
   children,
 }: {
   href: string
   label: string
   active?: boolean
   external?: boolean
+  side?: "left" | "right" | "top" | "bottom"
   children: React.ReactNode
 }) {
+  const isHash = !external && href.startsWith("#")
+
   return (
     <Tooltip>
       <TooltipTrigger
@@ -84,12 +95,24 @@ function DockLink({
             target={external ? "_blank" : undefined}
             rel={external ? "noreferrer" : undefined}
             className={cn(itemClass, active && "bg-muted text-foreground")}
+            onClick={
+              isHash
+                ? (event) => {
+                    const target = document.querySelector(href)
+                    if (!(target instanceof HTMLElement)) return
+                    event.preventDefault()
+                    target.scrollIntoView({ behavior: "smooth" })
+                  }
+                : undefined
+            }
           />
         }
       >
         {children}
       </TooltipTrigger>
-      <TooltipContent sideOffset={10}>{label}</TooltipContent>
+      <TooltipContent side={side} sideOffset={10}>
+        {label}
+      </TooltipContent>
     </Tooltip>
   )
 }
@@ -97,6 +120,7 @@ function DockLink({
 export function DockNav() {
   const active = useActiveSection()
   const { resolvedTheme, setTheme } = useTheme()
+  const reduced = useReducedMotion()
   const mounted = useSyncExternalStore(
     subscribe,
     () => true,
@@ -104,48 +128,76 @@ export function DockNav() {
   )
   const github = siteConfig.footer.links.find((l) => l.label === "GitHub")
   const linkedin = siteConfig.footer.links.find((l) => l.label === "LinkedIn")
+  const handshake = siteConfig.footer.links.find((l) => l.label === "Handshake")
+
+  const { scrollYProgress } = useScroll()
+  const floatY = useTransform(scrollYProgress, [0, 1], [0, 18])
+  const springY = useSpring(floatY, { stiffness: 80, damping: 28 })
 
   return (
-    <nav
+    <motion.nav
       aria-label="Sections"
-      className="pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 flex justify-center px-3"
+      style={{ y: reduced ? 0 : springY }}
+      className={cn(
+        "pointer-events-none fixed z-50 hidden md:flex",
+        "top-1/2 right-[max(0.75rem,env(safe-area-inset-right))] -translate-y-1/2"
+      )}
     >
       <Dock
-        iconSize={40}
-        iconMagnification={56}
-        className="pointer-events-auto mt-0 h-14 gap-1 bg-background/70 shadow-lg supports-backdrop-filter:bg-background/50 sm:gap-2"
+        orientation="vertical"
+        iconSize={36}
+        iconMagnification={48}
+        iconDistance={100}
+        className="pointer-events-auto mt-0 gap-1 bg-background/70 shadow-lg supports-backdrop-filter:bg-background/50"
       >
         {siteConfig.sections.map(({ label, href, icon: Icon }) => (
           <DockIcon key={href} className="p-0!">
-            <DockLink href={href} label={label} active={active === href}>
+            <DockLink href={href} label={label} active={active === href} side="left">
               <Icon />
             </DockLink>
           </DockIcon>
         ))}
 
-        <Separator orientation="vertical" className="mx-0.5 my-2" />
+        <Separator orientation="horizontal" className="mx-2 my-0.5 w-auto" />
 
         <DockIcon className="p-0!">
-          <DockLink href={siteConfig.resumeHref} label="Resume" external>
+          <DockLink
+            href={siteConfig.resumeHref}
+            label="Resume"
+            external
+            side="left"
+          >
             <FileText />
           </DockLink>
         </DockIcon>
         {github && (
-          <DockIcon className="p-0! max-sm:hidden">
-            <DockLink href={github.href} label="GitHub" external>
+          <DockIcon className="p-0!">
+            <DockLink href={github.href} label="GitHub" external side="left">
               <GithubOriginal className="[&_*]:fill-current" />
             </DockLink>
           </DockIcon>
         )}
         {linkedin && (
-          <DockIcon className="p-0! max-sm:hidden">
-            <DockLink href={linkedin.href} label="LinkedIn" external>
+          <DockIcon className="p-0!">
+            <DockLink href={linkedin.href} label="LinkedIn" external side="left">
               <LinkedinPlain className="[&_*]:fill-current" />
             </DockLink>
           </DockIcon>
         )}
+        {handshake && (
+          <DockIcon className="p-0!">
+            <DockLink
+              href={handshake.href}
+              label="Handshake"
+              external
+              side="left"
+            >
+              <Handshake />
+            </DockLink>
+          </DockIcon>
+        )}
 
-        <Separator orientation="vertical" className="mx-0.5 my-2" />
+        <Separator orientation="horizontal" className="mx-2 my-0.5 w-auto" />
 
         <DockIcon className="p-0!">
           <AnimatedThemeToggler
@@ -158,6 +210,6 @@ export function DockNav() {
           />
         </DockIcon>
       </Dock>
-    </nav>
+    </motion.nav>
   )
 }

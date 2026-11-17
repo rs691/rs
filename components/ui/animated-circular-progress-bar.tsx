@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react"
+
 import { cn } from "@/lib/utils"
 
 interface AnimatedCircularProgressBarProps {
@@ -36,7 +38,7 @@ export function AnimatedCircularProgressBar({
           "--delay": "0s",
           "--percent-to-deg": "3.6deg",
           transform: "translateZ(0)",
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       <svg
@@ -67,7 +69,7 @@ export function AnimatedCircularProgressBar({
                 transition: "all var(--transition-length) ease var(--delay)",
                 transformOrigin:
                   "calc(var(--circle-size) / 2) calc(var(--circle-size) / 2)",
-              } as React.CSSProperties
+              } as CSSProperties
             }
           />
         )}
@@ -93,7 +95,7 @@ export function AnimatedCircularProgressBar({
                 "rotate(calc(-90deg + var(--gap-percent) * var(--offset-factor) * var(--percent-to-deg)))",
               transformOrigin:
                 "calc(var(--circle-size) / 2) calc(var(--circle-size) / 2)",
-            } as React.CSSProperties
+            } as CSSProperties
           }
         />
       </svg>

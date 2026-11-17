@@ -17,7 +17,7 @@ export function ThemeToggleCorner() {
   )
 
   return (
-    <div className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50">
+    <div className="fixed top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))] z-50 md:top-[max(0.75rem,env(safe-area-inset-top))] md:right-[max(0.75rem,env(safe-area-inset-right))]">
       <AnimatedThemeToggler
         theme={
           mounted ? (resolvedTheme === "dark" ? "dark" : "light") : undefined

@@ -18,6 +18,8 @@ import {
   WandSparkles,
   type LucideIcon,
 } from "lucide-react"
+
+import { assetPath } from "@/lib/paths"
 import AmazonwebservicesPlainWordmark from "devicons-react/icons/AmazonwebservicesPlainWordmark"
 import AzureOriginal from "devicons-react/icons/AzureOriginal"
 import CsharpOriginal from "devicons-react/icons/CsharpOriginal"
@@ -85,7 +87,7 @@ export const siteConfig = {
   headline: "I build production systems end to end, from mobile to cloud.",
   description:
     "App Store and Play releases, real-time backends, AWS, and AI in live products.",
-  resumeHref: "/Resume.pdf",
+  resumeHref: assetPath("/Resume.pdf"),
   sections: [
     { label: "Home", href: "#top", icon: House },
     { label: "Stack", href: "#stack", icon: Layers },
@@ -96,7 +98,7 @@ export const siteConfig = {
   /** Primary CTA = contact; secondary = resume. Used by hero, marquee, and footer. */
   ctas: {
     primary: { label: "Get in touch", href: "#contact" },
-    secondary: { label: "View resume", href: "/Resume.pdf" },
+    secondary: { label: "View resume", href: assetPath("/Resume.pdf") },
   },
   marquee: {
     heading: "Tools I build with every day.",
@@ -119,10 +121,14 @@ export const siteConfig = {
     videoText: "LET'S BUILD",
     email: "rms.dev@outlook.com",
     primaryCta: { label: "Email me", href: "mailto:rms.dev@outlook.com" },
-    secondaryCta: { label: "View resume", href: "/Resume.pdf" },
+    secondaryCta: { label: "View resume", href: assetPath("/Resume.pdf") },
     links: [
       { label: "GitHub", href: "https://github.com/rs691" },
       { label: "LinkedIn", href: "https://linkedin.com/in/robert-stewart-m" },
+      {
+        label: "Handshake",
+        href: "https://bellevue.joinhandshake.com/profiles/robertstewart",
+      },
       { label: "Portfolio", href: "https://robert-stewart.dev" },
     ],
   },
@@ -199,6 +205,16 @@ export type Project = {
   links?: { label: string; href: string }[]
 }
 
+/**
+ * E-commerce bento demo — flip this to try alternates without touching JSX.
+ * - checkout: Stripe order feed (default; distinct from YourOpoly check-ins)
+ * - marquee: product shelf (original)
+ * - copilot: AI design/admin chat strip
+ * - rls: anon vs owner visibility gate
+ */
+export type EcommerceBentoVariant = "checkout" | "marquee" | "copilot" | "rls"
+export const ecommerceBentoVariant: EcommerceBentoVariant = "copilot"
+
 export const projects: Project[] = [
   {
     title: "YourOpoly",
@@ -255,7 +271,7 @@ export const projects: Project[] = [
     description:
       "Supabase Auth, Postgres RLS, Stripe Checkout, and AI design and admin copilots with pgvector RAG, gated by contract evals in CI.",
     stack: ["Next.js", "Supabase", "PostgreSQL", "Stripe", "Vercel AI SDK"],
-    status: "Open source demo",
+    status: "Live demo",
     icon: ShoppingBag,
     visual: "storefront",
     links: [{ label: "View on GitHub", href: "https://github.com/rs691/ecommerce-v1" }],
@@ -265,7 +281,7 @@ export const projects: Project[] = [
     description:
       "EF Core tenant isolation with Azure CI/CD — live API docs on GitHub Actions.",
     stack: ["C#", "ASP.NET Core", "JWT", "Azure", "GitHub Actions"],
-    status: "Live API · Azure",
+    status: "Live demo · Azure",
     icon: SquareTerminal,
     visual: "api",
     links: [
@@ -284,7 +300,7 @@ export const projects: Project[] = [
     description:
       "Booking app with transaction-safe conflict resolution and automated email confirmations.",
     stack: ["Django", "HTMX", "Python", "SQLite"],
-    status: "Open source demo",
+    status: "Live demo",
     icon: CalendarCheck,
     visual: "calendar",
     links: [{ label: "View on GitHub", href: "https://github.com/rs691/Moffat-Bay" }],
@@ -335,6 +351,7 @@ export const experience: Experience[] = [
     points: [
       "Architected cross-platform Flutter apps with JWT/OAuth, deep links, and QR entry flows on a shared mobile foundation.",
       "Built a multi-tenant Node.js backend with Socket.IO real-time delivery and 100+ automated tests.",
+      "Shipped Genkit AI workflows (Gemini → Groq) for a context-aware chatbot and admin digests.",
       "Migrated a Firebase prototype to AWS (ECS Fargate, RDS, ElastiCache, S3/CloudFront) and automated releases with GitHub Actions.",
     ],
   },
@@ -346,10 +363,11 @@ export const experience: Experience[] = [
     points: [
       "Mentored 100+ students in Python, JavaScript, database design, and software engineering.",
       "Ran code reviews on clean code, test-driven development, and system design fundamentals.",
+      "Created structured review materials and database design rubrics adopted across CIS course sections.",
     ],
   },
   {
-    role: "Junior Web Developer / IT Support",
+    role: "Junior Web Developer / IT Support Specialist",
     company: "Pierson Wireless",
     location: "Omaha, NE",
     period: "Oct 2022 – Nov 2023",
@@ -363,6 +381,11 @@ export const experience: Experience[] = [
 export const education = [
   { degree: "M.S. Data Science", school: "Bellevue University", date: "June 2028" },
   { degree: "B.S. Software Development", school: "Bellevue University", date: "June 2025" },
+  {
+    degree: "A.A. Computer Programming",
+    school: "Iowa Western Community College",
+    date: "May 2023",
+  },
 ]
 
 export type Review = {
@@ -393,11 +416,5 @@ export const reviews: Review[] = [
       "Python and JavaScript office hours that untangled loops, APIs, and debugging strategy — not just the answer for tonight's homework.",
     name: "One-on-one mentoring",
     context: "100+ students mentored · Bellevue University",
-  },
-  {
-    quote:
-      "Structured review materials and database rubrics that got reused across course sections — tutoring that scaled beyond a single appointment.",
-    name: "Course support materials",
-    context: "CIS peer tutoring · Bellevue University",
   },
 ]

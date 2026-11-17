@@ -10,7 +10,10 @@ import {
   useSpring,
 } from "motion/react"
 
-import { SectionHeading } from "@/components/sections/section-heading"
+import {
+  SectionHeading,
+  sectionBodyClass,
+} from "@/components/sections/section-heading"
 import { BlurFade } from "@/components/ui/blur-fade"
 import { education, experience, siteConfig } from "@/lib/site-config"
 import { cn } from "@/lib/utils"
@@ -58,14 +61,15 @@ export function Experience() {
   }, [])
 
   return (
-    <section id="experience" className="scroll-mt-16">
-      <SectionHeading
-        heading={heading}
-        description={description}
-        size="display"
-      />
+    <section id="experience" className="scroll-mt-24">
+      <SectionHeading heading={heading} description={description} />
 
-      <div className="mx-auto mt-12 max-w-3xl px-5 md:mt-16 md:px-6">
+      <div
+        className={cn(
+          "mx-auto max-w-3xl px-5 md:px-6",
+          sectionBodyClass
+        )}
+      >
         <div className="relative pl-8 md:pl-12">
           <div
             aria-hidden
@@ -93,7 +97,7 @@ export function Experience() {
                     className={cn(
                       "absolute top-1.5 -left-8 size-[15px] rounded-full border-2 border-background md:-left-12 md:size-[23px] md:border-4",
                       isRevealed
-                        ? "bg-linear-to-br from-[#ff2975] to-[#00a3bd] dark:to-[#00FFF1]"
+                        ? "bg-linear-to-br from-[#ff2975] to-[#00a3bd] shadow-[0_0_12px_2px_rgba(255,41,117,0.35),0_0_20px_4px_rgba(0,163,189,0.2)] dark:to-[#00FFF1] dark:shadow-[0_0_14px_2px_rgba(255,41,117,0.4),0_0_22px_4px_rgba(0,255,241,0.25)]"
                         : "bg-muted-foreground/40"
                     )}
                   />
@@ -152,10 +156,10 @@ export function Experience() {
         </div>
 
         <BlurFade inView direction="up" offset={16}>
-          <div className="mt-14 flex flex-col gap-3 rounded-2xl border border-black/10 bg-card p-6 shadow-[inset_0_1px_0_rgba(255,255,255,1),0_10px_28px_-10px_rgba(0,0,0,.14),0_24px_48px_-20px_rgba(0,0,0,.1)] md:flex-row md:items-center md:gap-8 dark:border-white/10 dark:shadow-none">
-            <GraduationCap className="size-6 shrink-0 text-muted-foreground" />
+          <div className="mt-14 flex flex-col gap-4 rounded-2xl border border-black/10 bg-card p-6 shadow-[inset_0_1px_0_rgba(255,255,255,1),0_10px_28px_-10px_rgba(0,0,0,.14),0_24px_48px_-20px_rgba(0,0,0,.1)] md:flex-row md:flex-wrap md:items-start md:gap-x-8 md:gap-y-4 dark:border-white/10 dark:shadow-none">
+            <GraduationCap className="size-6 shrink-0 text-muted-foreground md:mt-0.5" />
             {education.map((item) => (
-              <div key={item.degree} className="flex flex-col">
+              <div key={item.degree} className="flex min-w-[12rem] flex-col">
                 <span className="font-medium">{item.degree}</span>
                 <span className="text-sm text-muted-foreground">
                   {item.school} · {item.date}

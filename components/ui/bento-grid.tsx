@@ -1,8 +1,8 @@
 import { type ComponentPropsWithoutRef, type ReactNode } from "react"
 import { ArrowRight } from "lucide-react"
 
+import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 
 interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
   children: ReactNode
@@ -47,16 +47,19 @@ function CardCta({
   className?: string
 }) {
   return (
-    <Button
-      variant="link"
-      size="sm"
-      className={cn("pointer-events-auto p-0", className)}
-      render={<a href={href} target="_blank" rel="noreferrer" />}
-      nativeButton={false}
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className={cn(
+        buttonVariants({ variant: "link", size: "sm" }),
+        "pointer-events-auto p-0",
+        className
+      )}
     >
       {cta}
-      <ArrowRight data-icon="inline-end" />
-    </Button>
+      <ArrowRight data-icon="inline-end" aria-hidden />
+    </a>
   )
 }
 
@@ -99,11 +102,12 @@ const BentoCard = ({
     >
       <div
         className={cn(
-          "pointer-events-none flex transform-gpu flex-col transition-all duration-300 lg:group-hover:-translate-y-10",
+          "pointer-events-none flex flex-col",
           compact ? "gap-0.5" : "gap-1"
         )}
       >
         <Icon
+          aria-hidden
           className={cn(
             "origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300",
             compact ? "h-8 w-8" : "h-12 w-12"
@@ -135,20 +139,18 @@ const BentoCard = ({
         {children}
       </div>
 
+      {/* One CTA always — avoids duplicate tab stops + hover-only links on desktop */}
       {href && cta && (
-        <div className="pointer-events-none flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden">
+        <div className="pointer-events-none mt-2 flex w-full flex-row items-center">
           <CardCta href={href} cta={cta} />
         </div>
       )}
     </div>
 
-    {href && cta && (
-      <div className="pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex">
-        <CardCta href={href} cta={cta} />
-      </div>
-    )}
-
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3 group-hover:dark:bg-neutral-800/10" />
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3 group-hover:dark:bg-neutral-800/10"
+    />
   </div>
 )
 

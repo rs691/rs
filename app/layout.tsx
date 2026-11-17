@@ -2,9 +2,11 @@ import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter, Noto_Sans, Playfair_Display } from "next/font/google"
 
 import "./globals.css"
+import { SkipLink } from "@/components/skip-link"
+import { SmoothScroll } from "@/components/smooth-scroll"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 const playfairDisplayHeading = Playfair_Display({subsets:['latin'],variable:'--font-heading'});
 
@@ -42,8 +44,11 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, fontDisplay.variable, "font-sans", notoSans.variable, playfairDisplayHeading.variable)}
     >
       <body>
+        <SkipLink />
         <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <SmoothScroll>
+            <TooltipProvider>{children}</TooltipProvider>
+          </SmoothScroll>
         </ThemeProvider>
       </body>
     </html>
